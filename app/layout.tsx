@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Calculadora MHP - Meile",
-  description: "Calculadora MHP - Meile",
+  title: "Revenda Meile",
+  description: "Revenda Meile",
 };
 
 export default function RootLayout({
