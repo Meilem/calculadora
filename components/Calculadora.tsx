@@ -272,7 +272,7 @@ const Tooltip: React.FC<TooltipProps> = ({
         isOpen &&
         createPortal(
           <div
-            className="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(false);
@@ -493,7 +493,7 @@ export default function Calculadora({
             <svg
               width="83"
               height="30"
-              className="w-17.5 h-6.25 sm:w-20.75 sm:h-7.5"
+              className="w-[70px] h-[25px] sm:w-[83px] sm:h-[30px]"
               viewBox="0 0 83 30"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -549,11 +549,8 @@ export default function Calculadora({
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto border-t sm:border-t-0 border-gray-100 dark:border-slate-800/50 pt-3 sm:pt-0">
-            <span
-              className="text-[11px] sm:text-xs font-medium text-[#4254a6] dark:text-[#8aa3ff] flex items-center gap-1
-             bg-[#4254a6]/10 px-5 py-2 border rounded-full border-[#4254a6]/20 dark:border-[#8aa3ff]/20 dark:bg-[#4254a6]/20 "
-            >
-              ⏲ Valores Válidos até 31/07/2026
+            <span className="text-[11px] sm:text-xs text-sm font-bold text-[#4254a6] dark:text-[#8aa3ff] mb-1flex items-center gap-1 bg-[#4254a6]/5 dark:bg-[#4254a6]/20 border border-[#4254a6]/10 p-2 rounded-full">
+              Valores Válidos até 31/07/2026
             </span>
 
             <button
@@ -591,7 +588,7 @@ export default function Calculadora({
 
       <div className="w-full max-w-7xl px-4 flex flex-col lg:flex-row gap-3 pb-5">
         <div className="flex-1 space-y-3">
-          {/* US01 - Franquia (Com a Nova Tabela de Cálculo adicionada) */}
+          {/* US01 - Franquia (Com a Tabela Dinâmica baseada nos planos da rota) */}
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-100 dark:border-slate-700/50 transition-colors">
             <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-4">
               Simulador de E-mail (Franquia)
@@ -599,38 +596,6 @@ export default function Calculadora({
             <div className="bg-[#4254a6]/5 dark:bg-[#4254a6]/20 border border-[#4254a6]/10 p-4 rounded-md">
               <label className="flex items-center text-sm text-[#4254a6] dark:text-[#8aa3ff] font-medium mb-1">
                 Valor da Franquia (R$)
-                <Tooltip title="Valor Unitário de Caixas Postais">
-                  <table className="w-full text-center border-collapse text-sm">
-                    <thead>
-                      <tr className="bg-gray-100 dark:bg-slate-700/50">
-                        <th className="p-2 border dark:border-slate-700 font-bold">
-                          TAMANHO
-                        </th>
-                        <th className="p-2 border dark:border-slate-700 font-bold">
-                          PREÇO
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {BOX_SIZES.filter((b) => b.id !== "none").map((box) => (
-                        <tr
-                          key={box.id}
-                          className="hover:bg-[#4254a6]/5 dark:hover:bg-slate-700 transition-colors"
-                        >
-                          <td className="p-2 border dark:border-slate-700 text-gray-800 dark:text-slate-200">
-                            {box.name
-                              .replace("gb", " GB")
-                              .replace("GB", " GB")
-                              .toUpperCase()}
-                          </td>
-                          <td className="p-2 border dark:border-slate-700 font-medium text-[#4254a6] dark:text-[#8aa3ff]">
-                            {formatCurrency(box.unitCost)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Tooltip>
               </label>
               <input
                 type="number"
@@ -650,6 +615,35 @@ export default function Calculadora({
               <div className="flex-1">
                 <label className="block text-sm text-gray-600 dark:text-slate-300 mb-1">
                   Plano de E-mail
+                  <Tooltip title="Valor Unitário de Caixas Postais">
+                    <table className="w-full text-left border-collapse text-sm">
+                      <thead>
+                        <tr className="bg-gray-100 dark:bg-slate-700/50">
+                          <th className="p-2 border dark:border-slate-700 font-bold">
+                            PLANO
+                          </th>
+                          <th className="p-2 border dark:border-slate-700 font-bold text-center">
+                            PREÇO
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {planosEmail.map((plan) => (
+                          <tr
+                            key={plan.id}
+                            className="hover:bg-[#4254a6]/5 dark:hover:bg-slate-700 transition-colors"
+                          >
+                            <td className="p-2 border dark:border-slate-700 text-gray-800 dark:text-slate-200">
+                              {plan.name}
+                            </td>
+                            <td className="p-2 border dark:border-slate-700 font-medium text-[#4254a6] dark:text-[#8aa3ff] text-center">
+                              {formatCurrency(plan.jumpCost)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </Tooltip>
                 </label>
                 <select
                   value={emailPlanId}
