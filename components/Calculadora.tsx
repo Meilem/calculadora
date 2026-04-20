@@ -599,7 +599,7 @@ export default function Calculadora({
             <div className="bg-[#4254a6]/5 dark:bg-[#4254a6]/20 border border-[#4254a6]/10 p-4 rounded-md">
               <label className="flex items-center text-sm text-[#4254a6] dark:text-[#8aa3ff] font-medium mb-1">
                 Valor da Franquia (R$)
-                <Tooltip title="Valor Unitário de caixas postais">
+                <Tooltip title="Valor Unitário de Caixas Postais">
                   <table className="w-full text-center border-collapse text-sm">
                     <thead>
                       <tr className="bg-gray-100 dark:bg-slate-700/50">
