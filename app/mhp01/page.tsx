@@ -3,6 +3,21 @@
 import React from "react";
 import Calculadora, { EmailPlan } from "../../components/Calculadora";
 
+// Tipagens para o retorno da API do Notion
+type NotionProperty = {
+  title?: Array<{ plain_text: string }>;
+  rich_text?: Array<{ plain_text: string }>;
+  number?: number;
+  select?: { name: string };
+  date?: { start: string; end?: string };
+  type?: string;
+};
+
+type NotionPage = {
+  id: string;
+  properties: Record<string, NotionProperty>;
+};
+
 // ==========================================
 // 1. FUNÇÕES DE BUSCA NO NOTION (SERVER-SIDE)
 // ==========================================
@@ -69,33 +84,33 @@ async function getAllNotionData() {
   ]);
 
   // --- DEMAIS DADOS ---
-  const boxData = boxResults.map((page: any) => ({
+  const boxData = boxResults.map((page: NotionPage) => ({
     id: page.id,
-    capacidade: page.properties["Capacidade"]?.title[0]?.plain_text || "N/A",
+    capacidade: page.properties["Capacidade"]?.title?.[0]?.plain_text || "N/A",
     custoFixo: page.properties["Custo Unitário Fixo"]?.number || 0,
     baseSugerida: page.properties["Base Sugerida"]?.number || 0,
     puloSugerido: page.properties["Pulo Sugerido"]?.number || 0,
   }));
 
-  const smtpData = smtpResults.map((page: any) => ({
+  const smtpData = smtpResults.map((page: NotionPage) => ({
     id: page.id,
-    plano: page.properties["Plano / Volume"]?.title[0]?.plain_text || "N/A",
+    plano: page.properties["Plano / Volume"]?.title?.[0]?.plain_text || "N/A",
     categoria: page.properties["Categoria"]?.select?.name || "N/A",
     custoRevenda: page.properties["Custo Revenda"]?.number || 0,
     valorSugerido: page.properties["Valor Sugerido"]?.number || 0,
   }));
 
-  const extrasData = extrasResults.map((page: any) => ({
+  const extrasData = extrasResults.map((page: NotionPage) => ({
     id: page.id,
-    servico: page.properties["Serviço"]?.title[0]?.plain_text || "N/A",
+    servico: page.properties["Serviço"]?.title?.[0]?.plain_text || "N/A",
     custoRevenda: page.properties["Custo Revenda"]?.number || 0,
     valorSugerido: page.properties["Valor Sugerido"]?.number || 0,
     tipoCobranca: page.properties["Tipo de Cobrança"]?.select?.name || "N/A",
   }));
 
-  const upgradesData = upgradesResults.map((page: any) => ({
+  const upgradesData = upgradesResults.map((page: NotionPage) => ({
     id: page.id,
-    tamanho: page.properties["Tamanho"]?.title[0]?.plain_text || "N/A",
+    tamanho: page.properties["Tamanho"]?.title?.[0]?.plain_text || "N/A",
     mes1: page.properties["1 Mês"]?.number || 0,
     meses3: page.properties["3 Meses"]?.number || 0,
     ano1: page.properties["1 Ano"]?.number || 0,
@@ -132,7 +147,7 @@ async function getAllNotionData() {
 
   // --- NOVO: PLANOS DE E-MAIL DINÂMICOS ---
   const emailData: EmailPlan[] = emailResults
-    .map((page: any) => {
+    .map((page: NotionPage) => {
       // Tenta ler a coluna de arquivamento independente se for tipo "Select" ou "Texto"
       const archiveTimeRaw =
         page.properties["Arquivamento"]?.select?.name ||
@@ -155,7 +170,7 @@ async function getAllNotionData() {
 
   // --- AQUI: MATRIZ DE VALORES BASE (F01 A F30) ---
   const matrizSugerida = (valoresBaseResults || [])
-    .map((page: any) => {
+    .map((page: NotionPage) => {
       const props = page.properties;
       const linha: number[] = [];
 
@@ -166,12 +181,18 @@ async function getAllNotionData() {
       }
 
       return {
-        ordem: props["Ordem"]?.number || 0, // Usamos a propriedade "Ordem" para alinhar as linhas corretamente
+        ordem: props["Ordem"]?.number || 0,
         valores: linha,
       };
     })
-    .sort((a: any, b: any) => a.ordem - b.ordem) // Ordena para garantir que a linha 1 fique com o plano 1
-    .map((i: any) => i.valores);
+    // Removendo os 'any' e tipando corretamente os objetos:
+    .sort(
+      (
+        a: { ordem: number; valores: number[] },
+        b: { ordem: number; valores: number[] },
+      ) => a.ordem - b.ordem,
+    )
+    .map((i: { ordem: number; valores: number[] }) => i.valores);
 
   // Se o Notion estiver vazio ou falhar, mandamos um array vazio para não quebrar a tela
   return {
