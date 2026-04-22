@@ -46,151 +46,44 @@ interface ExtraFeatures {
   phishing: boolean;
 }
 
+export interface NotionDataProp {
+  boxData: Array<{
+    id: string;
+    capacidade: string;
+    custoFixo: number;
+    baseSugerida: number;
+    puloSugerido: number;
+  }>;
+  smtpData: Array<{
+    id: string;
+    plano: string;
+    categoria: string;
+    custoRevenda: number;
+    valorSugerido: number;
+  }>;
+  extrasData: Array<{
+    id: string;
+    servico: string;
+    custoRevenda: number;
+    valorSugerido: number;
+    tipoCobranca: string;
+  }>;
+  upgradesData: Array<{
+    id: string;
+    tamanho: string;
+    mes1: number;
+    meses3: number;
+    ano1: number;
+    anos2: number;
+    anos10: number;
+  }>;
+  textoValidade?: string;
+  matrizSugerida?: number[][]; // ADICIONADO AQUI
+}
+
 // ==========================================
-// 2. DADOS CONSTANTES
+// 2. DADOS CONSTANTES (REMOVIDO VALORES_BASE_EMAIL FIXO)
 // ==========================================
-
-const VALORES_BASE_EMAIL = [
-  [
-    49.88, 62.38, 74.88, 87.38, 99.88, 118, 136.13, 154.25, 172.38, 190.5,
-    208.63, 226.75, 244.88, 263, 281.13, 299.25, 317.38, 335.5, 353.63, 371.75,
-    389.88, 408, 426.13, 444.25, 462.38, 480.5, 498.63, 516.75, 534.88, 553,
-  ],
-  [
-    62.38, 87.38, 112.38, 137.38, 162.38, 187.38, 212.38, 237.38, 262.38,
-    287.38, 312.38, 337.38, 362.38, 387.38, 412.38, 437.38, 462.38, 487.38,
-    512.38, 537.38, 562.38, 587.38, 612.38, 637.38, 662.38, 687.38, 712.38,
-    737.38, 762.38, 787.38,
-  ],
-  [
-    74.88, 124.88, 174.88, 224.88, 274.88, 324.88, 374.88, 424.88, 474.88,
-    524.88, 574.88, 624.88, 674.88, 724.88, 774.88, 824.88, 874.88, 924.88,
-    974.88, 1024.88, 1074.88, 1124.88, 1174.88, 1224.88, 1274.88, 1324.88,
-    1374.88, 1424.88, 1474.88, 1524.88,
-  ],
-  [
-    100.0, 175.0, 250.0, 300.0, 375.0, 450.0, 525.0, 600.0, 675.0, 750.0, 825.0,
-    900.0, 975.0, 1050.0, 1125.0, 1200.0, 1275.0, 1350.0, 1425.0, 1500.0,
-    1575.0, 1650.0, 1725.0, 1800.0, 1875.0, 1950.0, 2025.0, 2100.0, 2175.0,
-    2250.0,
-  ],
-  [
-    112.5, 200.0, 287.5, 350.0, 437.5, 525.0, 612.5, 700.0, 787.5, 875.0, 962.5,
-    1050.0, 1137.5, 1225.0, 1312.5, 1400.0, 1487.5, 1575.0, 1662.5, 1750.0,
-    1837.5, 1925.0, 2012.5, 2100.0, 2187.5, 2275.0, 2362.5, 2450.0, 2537.5,
-    2625.0,
-  ],
-  [
-    125.0, 225.0, 325.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0,
-    1100.0, 1200.0, 1300.0, 1400.0, 1500.0, 1600.0, 1700.0, 1800.0, 1900.0,
-    2000.0, 2100.0, 2200.0, 2300.0, 2400.0, 2500.0, 2600.0, 2700.0, 2800.0,
-    2900.0, 3000.0,
-  ],
-  [
-    150.0, 275.0, 400.0, 500.0, 625.0, 750.0, 875.0, 1000.0, 1125.0, 1250.0,
-    1375.0, 1500.0, 1625.0, 1750.0, 1875.0, 2000.0, 2125.0, 2250.0, 2375.0,
-    2500.0, 2625.0, 2750.0, 2875.0, 3000.0, 3125.0, 3250.0, 3375.0, 3500.0,
-    3625.0, 3750.0,
-  ],
-];
-
-const UPGRADES_DATA: Record<string, Record<string, number>> = {
-  "2GB": {
-    "1 Mês": 2.03,
-    "3 Meses": 2.52,
-    "1 Ano": 3.92,
-    "2 Anos": 5.32,
-    "10 Anos": 7.7,
-  },
-  "10GB": {
-    "1 Mês": 2.66,
-    "3 Meses": 2.8,
-    "1 Ano": 4.62,
-    "2 Anos": 5.74,
-    "10 Anos": 9.8,
-  },
-  "25GB": {
-    "1 Mês": 4.2,
-    "3 Meses": 4.48,
-    "1 Ano": 5.6,
-    "2 Anos": 7.0,
-    "10 Anos": 11.2,
-  },
-  "50GB": {
-    "1 Mês": 5.6,
-    "3 Meses": 6.3,
-    "1 Ano": 7.0,
-    "2 Anos": 8.4,
-    "10 Anos": 14.0,
-  },
-  "100GB": {
-    "1 Mês": 16.1,
-    "3 Meses": 18.2,
-    "1 Ano": 22.4,
-    "2 Anos": 26.6,
-    "10 Anos": 40.6,
-  },
-  "150GB": {
-    "1 Mês": 28.48,
-    "3 Meses": 32.51,
-    "1 Ano": 46.62,
-    "2 Anos": 59.22,
-    "10 Anos": 71.06,
-  },
-  "200GB": {
-    "1 Mês": 37.67,
-    "3 Meses": 43.97,
-    "1 Ano": 60.35,
-    "2 Anos": 69.17,
-    "10 Anos": 88.07,
-  },
-};
-
-const UPGRADE_SIZES = Object.keys(UPGRADES_DATA).map((size) => ({
-  id: size,
-  name: size,
-}));
-const UPGRADE_TIMES = Object.keys(UPGRADES_DATA["2GB"]);
-
-const SMTP_PLANS: SmtpMktPlan[] = [
-  { id: "none", name: "Nenhum", cost: 0, suggested: 0 },
-  { id: "5k", name: "5.000/mês", cost: 44.99, suggested: 58.49 },
-  { id: "10k", name: "10.000/mês", cost: 59.99, suggested: 77.99 },
-  { id: "25k", name: "25.000/mês", cost: 80.99, suggested: 105.29 },
-  { id: "50k", name: "50.000/mês", cost: 141.75, suggested: 184.28 },
-  { id: "75k", name: "75.000/mês", cost: 212.63, suggested: 276.42 },
-  { id: "100k", name: "100.000/mês", cost: 283.5, suggested: 368.55 },
-  { id: "150k", name: "150.000/mês", cost: 425.25, suggested: 552.83 },
-  { id: "250k", name: "250.000/mês", cost: 708.75, suggested: 921.38 },
-  { id: "350k", name: "350.000/mês", cost: 992.25, suggested: 1289.93 },
-  { id: "500k", name: "500.000/mês", cost: 1417.5, suggested: 1842.75 },
-  { id: "1m", name: "1.000.000/mês", cost: 2835.0, suggested: 3685.5 },
-];
-
-const MKT_PLANS: SmtpMktPlan[] = [
-  { id: "none", name: "Nenhum", cost: 0, suggested: 0 },
-  { id: "5k", name: "5.000 envios", cost: 49.9, suggested: 64.87 },
-  { id: "10k", name: "10.000 envios", cost: 57.8, suggested: 75.14 },
-  { id: "15k", name: "15.000 envios", cost: 87.0, suggested: 113.1 },
-  { id: "25k", name: "25.000 envios", cost: 124.5, suggested: 161.85 },
-  { id: "50k", name: "50.000 envios", cost: 229.9, suggested: 298.87 },
-  { id: "75k", name: "75.000 envios", cost: 299.9, suggested: 389.87 },
-  { id: "100k", name: "100.000 envios", cost: 349.9, suggested: 454.87 },
-  { id: "150k", name: "150.000 envios", cost: 514.5, suggested: 668.85 },
-  { id: "250k", name: "250.000 envios", cost: 857.5, suggested: 1114.75 },
-  { id: "350k", name: "350.000 envios", cost: 1200.5, suggested: 1560.65 },
-  { id: "500k", name: "500.000 envios", cost: 1715.0, suggested: 2229.5 },
-  { id: "1m", name: "1.000.000 envios", cost: 3430.0, suggested: 4459.0 },
-];
-
-const BOX_SIZES: BoxSize[] = [
-  { id: "none", name: "Nenhum", unitCost: 0, baseSug: 0, stepSug: 0 },
-  { id: "2gb", name: "2GB", unitCost: 1.8, baseSug: 67.37, stepSug: 19.575 },
-  { id: "5gb", name: "5GB", unitCost: 2.25, baseSug: 80.87, stepSug: 24.3 },
-  { id: "10gb", name: "10GB", unitCost: 4.35, baseSug: 94.37, stepSug: 46.575 },
-  { id: "15gb", name: "15GB", unitCost: 7.5, baseSug: 114.62, stepSug: 57.305 },
-  { id: "25gb", name: "25GB", unitCost: 10.9, baseSug: 134.87, stepSug: 71.55 },
-];
 
 const formatCurrency = (val: number): string =>
   `R$ ${val.toFixed(2).replace(".", ",")}`;
@@ -207,7 +100,7 @@ const getBoxSuggestedValue = (
 };
 
 // ==========================================
-// 3. COMPONENTE DE TOOLTIP (MODAL VIA PORTAL - SEM ERROS NEXT.JS)
+// 3. COMPONENTE DE TOOLTIP (PORTAL)
 // ==========================================
 interface TooltipProps {
   title?: string;
@@ -223,18 +116,11 @@ const Tooltip: React.FC<TooltipProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Garante que o Portal só vai renderizar no lado do cliente
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  // Impede o scroll da página de fundo quando o modal estiver aberto
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -242,12 +128,11 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <span className="inline-flex items-center ml-2">
-      {/* Botão Disparador (Ícone + Texto "Ver Tabela") */}
       <button
         type="button"
         onClick={(e) => {
           e.preventDefault();
-          e.stopPropagation(); // Evita conflitos com clicks de labels pai
+          e.stopPropagation();
           setIsOpen(true);
         }}
         className="group inline-flex items-center gap-1.5 text-[#4254a6] dark:text-[#8aa3ff] transition-all focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#4254a6] rounded-md px-1"
@@ -267,7 +152,6 @@ const Tooltip: React.FC<TooltipProps> = ({
         </span>
       </button>
 
-      {/* Fundo escuro e Modal usando React Portal */}
       {mounted &&
         isOpen &&
         createPortal(
@@ -278,17 +162,10 @@ const Tooltip: React.FC<TooltipProps> = ({
               setIsOpen(false);
             }}
           >
-            {/* Caixa de conteúdo do Modal */}
             <div
-              className={`
-              bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 text-sm 
-              rounded-xl border border-gray-200 dark:border-slate-700 p-5 
-              shadow-2xl relative transition-all animate-in zoom-in-95 duration-200
-              ${large ? "w-full max-w-4xl" : "w-full max-w-md"}
-            `}
-              onClick={(e) => e.stopPropagation()} // Previne que o clique dentro da caixa a feche
+              className={`bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 text-sm rounded-xl border border-gray-200 dark:border-slate-700 p-5 shadow-2xl relative transition-all animate-in zoom-in-95 duration-200 ${large ? "w-full max-w-4xl" : "w-full max-w-md"}`}
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Botão X para fechar */}
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -297,36 +174,34 @@ const Tooltip: React.FC<TooltipProps> = ({
               >
                 ✕
               </button>
-
-              {/* Cabeçalho do Modal */}
               {title && (
                 <div className="font-bold text-lg text-gray-900 dark:text-white mb-4 border-b border-gray-100 dark:border-slate-700 pb-3 pr-8 flex items-center justify-between">
                   <span>{title}</span>
                 </div>
               )}
-
-              {/* Corpo da Tabela (com rolagem se ficar muito grande) */}
               <div className="max-h-[75vh] overflow-y-auto overflow-x-auto custom-scrollbar rounded-lg">
                 {children}
               </div>
             </div>
           </div>,
-          document.body, // Injeta o modal direto na raiz da página
+          document.body,
         )}
     </span>
   );
 };
 
 // ==========================================
-// 4. COMPONENTE PRINCIPAL
+// 4. COMPONENTE PRINCIPAL (DINÂMICO)
 // ==========================================
 
 export default function Calculadora({
   planosEmail,
   tituloRota,
+  dadosNotion,
 }: {
   planosEmail: EmailPlan[];
   tituloRota?: string;
+  dadosNotion?: NotionDataProp;
 }) {
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
@@ -334,8 +209,140 @@ export default function Calculadora({
     document.documentElement.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
+  // ==========================================
+  // PROCESSAMENTO E ORDENAÇÃO DOS DADOS DO NOTION
+  // ==========================================
+  const {
+    BOX_SIZES,
+    SMTP_PLANS,
+    MKT_PLANS,
+    UPGRADES_DATA,
+    UPGRADE_SIZES,
+    RECURSOS_EXTRAS,
+  } = useMemo(() => {
+    const safeData = dadosNotion || {
+      boxData: [],
+      smtpData: [],
+      extrasData: [],
+      upgradesData: [],
+    };
+
+    // 1. Box Sizes - ORDENADO POR PREÇO (Custo Fixo)
+    const boxes: BoxSize[] = [
+      { id: "none", name: "Nenhum", unitCost: 0, baseSug: 0, stepSug: 0 },
+      ...safeData.boxData
+        .map((b) => ({
+          id: b.id,
+          name: b.capacidade,
+          unitCost: b.custoFixo,
+          baseSug: b.baseSugerida,
+          stepSug: b.puloSugerido,
+        }))
+        .sort((a, b) => a.unitCost - b.unitCost),
+    ];
+
+    // 2. SMTP Plans - ORDENADO POR PREÇO
+    const smtps: SmtpMktPlan[] = [
+      { id: "none", name: "Nenhum", cost: 0, suggested: 0 },
+      ...safeData.smtpData
+        .filter((s) => s.categoria.toUpperCase().includes("SMTP"))
+        .map((s) => ({
+          id: s.id,
+          name: s.plano,
+          cost: s.custoRevenda,
+          suggested: s.valorSugerido,
+        }))
+        .sort((a, b) => a.cost - b.cost),
+    ];
+
+    // 3. MKT Plans - ORDENADO POR PREÇO
+    const mkts: SmtpMktPlan[] = [
+      { id: "none", name: "Nenhum", cost: 0, suggested: 0 },
+      ...safeData.smtpData
+        .filter(
+          (s) =>
+            s.categoria.toUpperCase().includes("MARKETING") ||
+            s.categoria.toUpperCase().includes("MKT"),
+        )
+        .map((m) => ({
+          id: m.id,
+          name: m.plano,
+          cost: m.custoRevenda,
+          suggested: m.valorSugerido,
+        }))
+        .sort((a, b) => a.cost - b.cost),
+    ];
+
+    // 4. Upgrades - ORDENADO POR TAMANHO
+    const upgrades: Record<string, Record<string, number>> = {};
+    safeData.upgradesData.forEach((u) => {
+      upgrades[u.tamanho] = {
+        "1 Mês": u.mes1,
+        "3 Meses": u.meses3,
+        "1 Ano": u.ano1,
+        "2 Anos": u.anos2,
+        "10 Anos": u.anos10,
+      };
+    });
+
+    const sizes = Object.keys(upgrades)
+      .sort((a, b) => {
+        const numA = parseInt(a.replace(/\D/g, "")) || 0;
+        const numB = parseInt(b.replace(/\D/g, "")) || 0;
+        return numA - numB;
+      })
+      .map((size) => ({ id: size, name: size }));
+
+    if (sizes.length === 0) sizes.push({ id: "none", name: "Carregando..." });
+
+    // 5. Recursos Extras Mapeados
+    const extraHosp = safeData.extrasData.find((e) =>
+      e.servico.includes("Hospedagem"),
+    );
+    const extraLgpd = safeData.extrasData.find((e) =>
+      e.servico.includes("LGPD"),
+    );
+    const extraPhish = safeData.extrasData.find((e) =>
+      e.servico.includes("Phishing"),
+    );
+
+    const extrasValues = {
+      hospedagem: {
+        cost: extraHosp?.custoRevenda || 0,
+        sug: extraHosp?.valorSugerido || 0,
+        label: "Fixo Mensal",
+      },
+      lgpd: {
+        cost: extraLgpd?.custoRevenda || 0,
+        sug: extraLgpd?.valorSugerido || 0,
+        label: "Por conta",
+      },
+      phishing: {
+        cost: extraPhish?.custoRevenda || 0,
+        sug: extraPhish?.valorSugerido || 0,
+        label: "Por conta",
+      },
+    };
+
+    return {
+      BOX_SIZES: boxes,
+      SMTP_PLANS: smtps,
+      MKT_PLANS: mkts,
+      UPGRADES_DATA: upgrades,
+      UPGRADE_SIZES: sizes,
+      RECURSOS_EXTRAS: extrasValues,
+    };
+  }, [dadosNotion]);
+
+  const UPGRADE_TIMES = ["1 Mês", "3 Meses", "1 Ano", "2 Anos", "10 Anos"];
+
+  // ==========================================
+  // ESTADOS DO COMPONENTE
+  // ==========================================
   const [franquia, setFranquia] = useState<number>(200);
-  const [emailPlanId, setEmailPlanId] = useState<string>(planosEmail[0].id);
+  const [emailPlanId, setEmailPlanId] = useState<string>(
+    planosEmail[0]?.id || "",
+  );
   const [emailAccounts, setEmailAccounts] = useState<number>(0);
   const [extras, setExtras] = useState<ExtraFeatures>({
     hospedagem: false,
@@ -343,8 +350,8 @@ export default function Calculadora({
     phishing: false,
   });
 
-  const selectedEmailPlan =
-    planosEmail.find((p) => p.id === emailPlanId) || planosEmail[0];
+  const selectedEmailPlan = planosEmail.find((p) => p.id === emailPlanId) ||
+    planosEmail[0] || { baseCost: 0, jumpCost: 0, archiveTime: "1 Mês" };
 
   const [upgradeSize, setUpgradeSize] = useState<string>(UPGRADE_SIZES[0].id);
   const [upgradeQty, setUpgradeQty] = useState<number>(1);
@@ -355,10 +362,29 @@ export default function Calculadora({
   const [smtpId, setSmtpId] = useState<string>(SMTP_PLANS[0].id);
   const [mktId, setMktId] = useState<string>(MKT_PLANS[0].id);
 
+  // Hydration
+  useEffect(() => {
+    if (UPGRADE_SIZES.length > 0 && upgradeSize === "none")
+      setUpgradeSize(UPGRADE_SIZES[0].id);
+  }, [UPGRADE_SIZES, upgradeSize]);
+  useEffect(() => {
+    if (BOX_SIZES.length > 0 && boxSizeId === "none")
+      setBoxSizeId(BOX_SIZES[0].id);
+  }, [BOX_SIZES, boxSizeId]);
+  useEffect(() => {
+    if (SMTP_PLANS.length > 0 && smtpId === "none") setSmtpId(SMTP_PLANS[0].id);
+  }, [SMTP_PLANS, smtpId]);
+  useEffect(() => {
+    if (MKT_PLANS.length > 0 && mktId === "none") setMktId(MKT_PLANS[0].id);
+  }, [MKT_PLANS, mktId]);
+
   const selectedBox = BOX_SIZES.find((b) => b.id === boxSizeId) || BOX_SIZES[0];
   const selectedSmtp = SMTP_PLANS.find((s) => s.id === smtpId) || SMTP_PLANS[0];
   const selectedMkt = MKT_PLANS.find((m) => m.id === mktId) || MKT_PLANS[0];
 
+  // ==========================================
+  // CÁLCULOS DINÂMICOS
+  // ==========================================
   const calculations = useMemo(() => {
     let consumido = 0;
     let sugeridoBase = 0;
@@ -367,7 +393,9 @@ export default function Calculadora({
     let sugeridoMkt = 0;
     const itemsResumo: { name: string; cost: number }[] = [];
 
-    // === CÁLCULOS DO E-MAIL ===
+    // USA APENAS A MATRIZ QUE VEM DO NOTION
+    const matrizFinal = dadosNotion?.matrizSugerida || [];
+
     if (emailAccounts > 0) {
       const emailCost =
         selectedEmailPlan.baseCost + emailAccounts * selectedEmailPlan.jumpCost;
@@ -378,32 +406,39 @@ export default function Calculadora({
       });
 
       const planIndex = planosEmail.findIndex((p) => p.id === emailPlanId);
-      if (planIndex >= 0 && planIndex < VALORES_BASE_EMAIL.length) {
+
+      // LÓGICA ATUALIZADA AQUI: Busca da matrizFinal com trava de segurança
+      if (
+        planIndex >= 0 &&
+        planIndex < matrizFinal.length &&
+        matrizFinal[planIndex]
+      ) {
         const valIndex = Math.min(Math.floor((emailAccounts - 1) / 10), 29);
-        sugeridoEmailExtras += VALORES_BASE_EMAIL[planIndex][valIndex];
+        sugeridoEmailExtras += matrizFinal[planIndex][valIndex] || 0;
       }
     }
 
-    // === CÁLCULOS DE EXTRAS ===
     if (extras.hospedagem) {
-      consumido += 9.9;
-      itemsResumo.push({ name: "Hospedagem de Site", cost: 9.9 });
-      sugeridoEmailExtras += 29.9;
+      consumido += RECURSOS_EXTRAS.hospedagem.cost;
+      itemsResumo.push({
+        name: "Hospedagem de Site",
+        cost: RECURSOS_EXTRAS.hospedagem.cost,
+      });
+      sugeridoEmailExtras += RECURSOS_EXTRAS.hospedagem.sug;
     }
     if (extras.lgpd && emailAccounts > 0) {
-      const lgpdCost = emailAccounts * 1.0;
+      const lgpdCost = emailAccounts * RECURSOS_EXTRAS.lgpd.cost;
       consumido += lgpdCost;
       itemsResumo.push({ name: "LGPD", cost: lgpdCost });
-      sugeridoEmailExtras += emailAccounts * 3.0;
+      sugeridoEmailExtras += emailAccounts * RECURSOS_EXTRAS.lgpd.sug;
     }
     if (extras.phishing && emailAccounts > 0) {
-      const phishCost = emailAccounts * 1.0;
+      const phishCost = emailAccounts * RECURSOS_EXTRAS.phishing.cost;
       consumido += phishCost;
       itemsResumo.push({ name: "Phishing Educativo", cost: phishCost });
-      sugeridoEmailExtras += emailAccounts * 3.0;
+      sugeridoEmailExtras += emailAccounts * RECURSOS_EXTRAS.phishing.sug;
     }
 
-    // === CÁLCULOS DE UPGRADES ===
     upgradeList.forEach((upg) => {
       consumido += upg.cost * upg.qty;
       itemsResumo.push({
@@ -412,7 +447,6 @@ export default function Calculadora({
       });
     });
 
-    // === CÁLCULOS DA MEILE BOX ===
     if (selectedBox.id !== "none" && boxQty > 0) {
       const boxCost = selectedBox.unitCost * boxQty;
       consumido += boxCost;
@@ -423,7 +457,6 @@ export default function Calculadora({
       });
     }
 
-    // === CÁLCULOS DE SMTP E MKT ===
     if (selectedSmtp.id !== "none") {
       consumido += selectedSmtp.cost;
       sugeridoSmtp = selectedSmtp.suggested;
@@ -440,6 +473,7 @@ export default function Calculadora({
         cost: selectedMkt.cost,
       });
     }
+
     return {
       consumido,
       disponivel: franquia - consumido,
@@ -464,11 +498,14 @@ export default function Calculadora({
     selectedSmtp,
     selectedMkt,
     selectedEmailPlan,
+    RECURSOS_EXTRAS,
+    dadosNotion?.matrizSugerida, // Adicionado às dependências
   ]);
 
   const handleAddUpgrade = () => {
+    if (!UPGRADES_DATA[upgradeSize]) return;
     const timeName = selectedEmailPlan.archiveTime;
-    const upgradeCost = UPGRADES_DATA[upgradeSize][timeName];
+    const upgradeCost = UPGRADES_DATA[upgradeSize][timeName] || 0;
     setUpgradeList([
       ...upgradeList,
       {
@@ -549,8 +586,9 @@ export default function Calculadora({
           </div>
 
           <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto border-t sm:border-t-0 border-gray-100 dark:border-slate-800/50 pt-3 sm:pt-0">
-            <span className="text-[11px] sm:text-xs text-sm font-bold text-[#4254a6] dark:text-[#8aa3ff] mb-1flex items-center gap-1 bg-[#4254a6]/5 dark:bg-[#4254a6]/20 border border-[#4254a6]/10 p-2 rounded-full">
-              Valores Válidos até 31/07/2026
+            {/* AQUI ESTÁ A MÁGICA DA VALIDADE QUE VEM DO NOTION */}
+            <span className="text-[11px] sm:text-xs font-bold text-[#4254a6] dark:text-[#8aa3ff] flex items-center gap-1 bg-[#4254a6]/5 dark:bg-[#4254a6]/20 border border-[#4254a6]/10 px-3 py-1.5 rounded-full">
+              {dadosNotion?.textoValidade || "Valores Dinâmicos (Ao Vivo)"}
             </span>
 
             <button
@@ -578,7 +616,7 @@ export default function Calculadora({
                   width="20px"
                   className="fill-gray-600 sm:w-[24px] sm:h-[24px]"
                 >
-                  <path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
+                  <path d="M565-395q35-35 35-85t-35-85q-35-35-85-35t-85 35q-35-35-85-35t-85 35q-35-35-85-35t-85 35q-35 35-35 85t35 85q35 35 85 35t85-35Zm-226.5 56.5Q280-397 280-480t58.5-141.5Q397-680 480-680t141.5 58.5Q680-563 680-480t-58.5 141.5Q563-280 480-280t-141.5-58.5ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Zm326-268Z" />
                 </svg>
               )}
             </button>
@@ -588,7 +626,7 @@ export default function Calculadora({
 
       <div className="w-full max-w-7xl px-4 flex flex-col lg:flex-row gap-3 pb-5">
         <div className="flex-1 space-y-3">
-          {/* US01 - Franquia (Com a Tabela Dinâmica baseada nos planos da rota) */}
+          {/* US01 - Franquia */}
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-gray-100 dark:border-slate-700/50 transition-colors">
             <h2 className="text-sm font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider mb-4">
               Simulador de E-mail (Franquia)
@@ -699,10 +737,10 @@ export default function Calculadora({
                           Hospedagem
                         </td>
                         <td className="p-2 border dark:border-slate-700 font-medium text-[#4254a6] dark:text-[#8aa3ff]">
-                          R$ 9,90
+                          {formatCurrency(RECURSOS_EXTRAS.hospedagem.cost)}
                         </td>
                         <td className="p-2 border dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400">
-                          Fixo Mensal
+                          {RECURSOS_EXTRAS.hospedagem.label}
                         </td>
                       </tr>
                       <tr>
@@ -710,10 +748,10 @@ export default function Calculadora({
                           LGPD
                         </td>
                         <td className="p-2 border dark:border-slate-700 font-medium text-[#4254a6] dark:text-[#8aa3ff]">
-                          R$ 1,00
+                          {formatCurrency(RECURSOS_EXTRAS.lgpd.cost)}
                         </td>
                         <td className="p-2 border dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400">
-                          Por conta
+                          {RECURSOS_EXTRAS.lgpd.label}
                         </td>
                       </tr>
                       <tr>
@@ -721,10 +759,10 @@ export default function Calculadora({
                           Phishing
                         </td>
                         <td className="p-2 border dark:border-slate-700 font-medium text-[#4254a6] dark:text-[#8aa3ff]">
-                          R$ 1,00
+                          {formatCurrency(RECURSOS_EXTRAS.phishing.cost)}
                         </td>
                         <td className="p-2 border dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400">
-                          Por conta
+                          {RECURSOS_EXTRAS.phishing.label}
                         </td>
                       </tr>
                     </tbody>
@@ -740,11 +778,7 @@ export default function Calculadora({
                       onClick={() =>
                         setExtras({ ...extras, [key]: !extras[key] })
                       }
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors inline-flex items-center gap-1.5 ${
-                        extras[key]
-                          ? "bg-[#4254a6] border-[#4254a6] text-[#ffffff]"
-                          : "bg-[#4254a6]/5 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-[#4254a6] dark:text-slate-300"
-                      }`}
+                      className={`px-3 py-1 rounded-full text-sm border transition-colors inline-flex items-center gap-1.5 ${extras[key] ? "bg-[#4254a6] border-[#4254a6] text-[#ffffff]" : "bg-[#4254a6]/5 dark:bg-slate-700 border-gray-200 dark:border-slate-600 text-[#4254a6] dark:text-slate-300"}`}
                     >
                       {extras[key] && (
                         <svg
@@ -787,7 +821,7 @@ export default function Calculadora({
                       <th className="p-2 border dark:border-slate-700">
                         Tamanho
                       </th>
-                      {Object.keys(UPGRADES_DATA["2GB"]).map((t) => (
+                      {UPGRADE_TIMES.map((t) => (
                         <th
                           key={t}
                           className="p-2 border dark:border-slate-700"
@@ -798,24 +832,31 @@ export default function Calculadora({
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.keys(UPGRADES_DATA).map((size) => (
-                      <tr
-                        key={size}
-                        className="hover:bg-[#4254a6]/5 dark:hover:bg-slate-700"
-                      >
-                        <td className="p-2 border dark:border-slate-700 font-bold text-gray-700 dark:text-slate-300">
-                          {size}
-                        </td>
-                        {Object.values(UPGRADES_DATA[size]).map((cost, i) => (
-                          <td
-                            key={i}
-                            className="p-2 border dark:border-slate-700 text-[#4254a6] dark:text-[#8aa3ff] font-medium"
+                    {UPGRADE_SIZES.filter((s) => s.id !== "none").map(
+                      (sizeItem) => {
+                        const size = sizeItem.id;
+                        return (
+                          <tr
+                            key={size}
+                            className="hover:bg-[#4254a6]/5 dark:hover:bg-slate-700"
                           >
-                            {formatCurrency(cost)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
+                            <td className="p-2 border dark:border-slate-700 font-bold text-gray-700 dark:text-slate-300">
+                              {size}
+                            </td>
+                            {UPGRADE_TIMES.map((time) => (
+                              <td
+                                key={time}
+                                className="p-2 border dark:border-slate-700 text-[#4254a6] dark:text-[#8aa3ff] font-medium"
+                              >
+                                {formatCurrency(
+                                  UPGRADES_DATA[size]?.[time] || 0,
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        );
+                      },
+                    )}
                   </tbody>
                 </table>
               </Tooltip>
@@ -876,7 +917,7 @@ export default function Calculadora({
               </button>
             </div>
 
-            {/* LISTA ACUMULATIVA DE UPGRADES */}
+            {/* LISTA DE UPGRADES */}
             <div className="space-y-2 mt-4">
               {upgradeList.map((upg) => (
                 <div
