@@ -530,7 +530,7 @@ export default function Calculadora({
             <svg
               width="83"
               height="30"
-              className="w-[70px] h-[25px] sm:w-[83px] sm:h-[30px]"
+              className="w-[70px] h-[25px] sm:w-[83px] sm:h-7.5"
               viewBox="0 0 83 30"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
