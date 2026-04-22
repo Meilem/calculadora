@@ -1,5 +1,6 @@
 // Arquivo: src/app/mhp02/page.tsx
 export const dynamic = "force-dynamic";
+
 import React from "react";
 import Calculadora, { EmailPlan } from "../../components/Calculadora";
 
@@ -35,7 +36,7 @@ async function fetchNotionDb(databaseId: string | undefined, token: string) {
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json",
         },
-        cache: "no-store",
+        cache: "no-store", // Busca ao vivo
       },
     );
 
@@ -47,6 +48,7 @@ async function fetchNotionDb(databaseId: string | undefined, token: string) {
     return [];
   }
 }
+
 async function getAllNotionData() {
   const token = process.env.NOTION_SECRET?.trim();
   if (!token) throw new Error("Faltou configurar NOTION_SECRET no .env.local");
@@ -55,12 +57,10 @@ async function getAllNotionData() {
   const dbSmtpId = process.env.NOTION_DB_SMTP?.trim();
   const dbExtrasId = process.env.NOTION_DB_EXTRAS?.trim();
   const dbUpgradesId = process.env.NOTION_DB_UPGRADES?.trim();
-  const dbValidadeId = process.env.NOTION_DB_VALIDADE?.trim();
 
-  // NOVO: Pegando a tabela de E-mails do MHP01
+  // VARIÁVEIS EXCLUSIVAS DO MHP02
+  const dbValidadeId = process.env.NOTION_DB_VALIDADE_02?.trim();
   const dbEmailId = process.env.NOTION_DB_EMAIL_02?.trim();
-
-  // AQUI: Pegando a tabela de Valores Base
   const dbValoresBaseId = process.env.NOTION_DB_VALORES_BASE?.trim();
 
   // Busca os bancos em paralelo
@@ -70,8 +70,8 @@ async function getAllNotionData() {
     extrasResults,
     upgradesResults,
     validadeResults,
-    emailResults, // Resultado dos e-mails
-    valoresBaseResults, // Resultado da matriz de Valores Base
+    emailResults,
+    valoresBaseResults,
   ] = await Promise.all([
     fetchNotionDb(dbBoxId, token),
     fetchNotionDb(dbSmtpId, token),
@@ -79,7 +79,7 @@ async function getAllNotionData() {
     fetchNotionDb(dbUpgradesId, token),
     fetchNotionDb(dbValidadeId, token),
     fetchNotionDb(dbEmailId, token),
-    fetchNotionDb(dbValoresBaseId, token), // Adicionado o fetch da nova tabela
+    fetchNotionDb(dbValoresBaseId, token),
   ]);
 
   // --- DEMAIS DADOS ---
@@ -117,37 +117,43 @@ async function getAllNotionData() {
     anos10: page.properties["10 Anos"]?.number || 0,
   }));
 
-  // --- VALIDADE ---
+  // --- VALIDADE E TÍTULO DINÂMICO ---
   let textoValidade = "Valores Dinâmicos (Ao Vivo)";
+  let tituloPagina = "MHP02";
+
   if (validadeResults && validadeResults.length > 0) {
-    const page = validadeResults[0];
+    const page = validadeResults[0] as NotionPage;
+
+    // CORREÇÃO AQUI: O tipo no Notion API é "title", não "titulo"
     const titlePropKey = Object.keys(page.properties).find(
       (key) => page.properties[key].type === "title",
     );
-    const textoInicial =
-      titlePropKey && page.properties[titlePropKey].title.length > 0
-        ? page.properties[titlePropKey].title[0].plain_text
-        : "Valores Válidos até";
 
+    tituloPagina =
+      titlePropKey && page.properties[titlePropKey]?.title?.[0]?.plain_text
+        ? page.properties[titlePropKey].title[0].plain_text
+        : "MHP02";
+
+    // Extrai a Data (O tipo "date" está correto)
     const datePropKey = Object.keys(page.properties).find(
       (key) => page.properties[key].type === "date",
     );
+
     const dataIso = datePropKey
-      ? page.properties[datePropKey].date?.start
+      ? page.properties[datePropKey]?.date?.start
       : null;
 
     if (dataIso) {
       const [ano, mes, dia] = dataIso.split("-");
-      textoValidade = `${textoInicial.trim()} ${dia}/${mes}/${ano}`;
+      textoValidade = `Valores Válidos até ${dia}/${mes}/${ano}`;
     } else {
-      textoValidade = textoInicial;
+      textoValidade = "Data não definida";
     }
   }
 
-  // --- NOVO: PLANOS DE E-MAIL DINÂMICOS ---
+  // --- PLANOS DE E-MAIL DINÂMICOS ---
   const emailData: EmailPlan[] = emailResults
     .map((page: NotionPage) => {
-      // Tenta ler a coluna de arquivamento independente se for tipo "Select" ou "Texto"
       const archiveTimeRaw =
         page.properties["Arquivamento"]?.select?.name ||
         page.properties["Arquivamento"]?.rich_text?.[0]?.plain_text ||
@@ -165,26 +171,22 @@ async function getAllNotionData() {
         archiveTime: archiveTimeRaw,
       };
     })
-    .sort((a: EmailPlan, b: EmailPlan) => a.jumpCost - b.jumpCost); // Ordena do mais barato para o mais caro
+    .sort((a: EmailPlan, b: EmailPlan) => a.jumpCost - b.jumpCost);
 
-  // --- AQUI: MATRIZ DE VALORES BASE (F01 A F30) ---
+  // --- MATRIZ DE VALORES BASE ---
   const matrizSugerida = (valoresBaseResults || [])
     .map((page: NotionPage) => {
       const props = page.properties;
       const linha: number[] = [];
-
-      // Laço para puxar de F01 até F30
       for (let i = 1; i <= 30; i++) {
         const key = `F${i.toString().padStart(2, "0")}`;
         linha.push(props[key]?.number || 0);
       }
-
       return {
         ordem: props["Ordem"]?.number || 0,
         valores: linha,
       };
     })
-    // Removendo os 'any' e tipando corretamente os objetos:
     .sort(
       (
         a: { ordem: number; valores: number[] },
@@ -193,15 +195,15 @@ async function getAllNotionData() {
     )
     .map((i: { ordem: number; valores: number[] }) => i.valores);
 
-  // Se o Notion estiver vazio ou falhar, mandamos um array vazio para não quebrar a tela
   return {
     boxData,
     smtpData,
     extrasData,
     upgradesData,
     textoValidade,
+    tituloPagina, // Exporta o título extraído
     emailData,
-    matrizSugerida, // Adicionado no retorno
+    matrizSugerida,
   };
 }
 
@@ -209,10 +211,9 @@ async function getAllNotionData() {
 // 2. COMPONENTE DA PÁGINA (SERVER COMPONENT)
 // ==========================================
 
-export default async function PageMHP01() {
+export default async function PageMHP02() {
   const dadosNotion = await getAllNotionData();
 
-  // Caso os dados de e-mail falhem, usamos um fallback vazio ou o app pode avisar que está carregando.
   const planosEmailParaCalculadora =
     dadosNotion.emailData && dadosNotion.emailData.length > 0
       ? dadosNotion.emailData
@@ -221,7 +222,7 @@ export default async function PageMHP01() {
   return (
     <Calculadora
       planosEmail={planosEmailParaCalculadora}
-      // tituloRota="MHP02"
+      tituloRota={dadosNotion.tituloPagina} // Passa o título para o Componente
       dadosNotion={dadosNotion}
     />
   );

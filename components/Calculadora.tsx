@@ -576,12 +576,7 @@ export default function Calculadora({
             </span>
 
             <h1 className="text-sm sm:text-base font-bold flex items-center">
-              Revenda<span className="font-light ml-1">Meile</span>
-              {tituloRota && (
-                <span className="ml-2 sm:ml-3 text-[9px] sm:text-[10px] bg-gray-100 dark:bg-white/20 text-gray-600 dark:text-gray-200 px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors">
-                  {tituloRota}
-                </span>
-              )}
+              {tituloRota && <span className="">{tituloRota}</span>}
             </h1>
           </div>
 
