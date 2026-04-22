@@ -1,5 +1,5 @@
 // Arquivo: src/app/mhp01/page.tsx
-
+export const dynamic = "force-dynamic";
 import React from "react";
 import Calculadora, { EmailPlan } from "../../components/Calculadora";
 
@@ -35,7 +35,7 @@ async function fetchNotionDb(databaseId: string | undefined, token: string) {
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json",
         },
-        // cache: 'no-store'
+        cache: "no-store",
       },
     );
 
